@@ -2,6 +2,7 @@ require('newrelic');
 const express = require('express');
 const cors = require('cors');
 const app = express();
+const axios = require('axios');
 
 const PORT = 3000;
 const HOST = 'localhost';
@@ -14,9 +15,19 @@ app.get('/info', (req, res, next) => {
 });
 
 app.get('/:productid', (req, res) => {
-  console.log('get', req.params.productid)
+  console.log('proxy get', req.params.productid)
   res.sendFile(__dirname + '/index.html');
-});
+})
+
+app.get('/api/reviews/:productid', (req, res) => {
+  axios.get(`http://localhost:3004/api/reviews/${req.params.productid}`)
+  .then((results)=>{
+    res.send(results.data)
+  })
+  .catch((err) => {
+    console.log(err)
+  })
+})
 
 app.listen(PORT, HOST, () => {
   console.log(`Starting Proxy at ${HOST}:${PORT}`);
